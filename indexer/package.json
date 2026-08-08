@@ -7,7 +7,7 @@
     "prebuild": "npm --prefix ../packages/sdk run build",
     "build": "tsc",
     "start": "node dist/index.js",
-    "test": "npm run build && node --test dist/*.test.js"
+    "test": "npm run build && node --test dist/extender.test.js dist/poller.test.js"
   },
   "dependencies": {
     "@archguard/sdk": "*",

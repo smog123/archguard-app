@@ -14,7 +14,7 @@
   },
   "scripts": {
     "build": "tsc",
-    "test": "npm run build && node --test dist/*.test.js"
+    "test": "npm run build && node --test dist/footprintKeys.test.js dist/integration.test.js"
   },
   "dependencies": {
     "@stellar/stellar-sdk": "16.2.0"
