@@ -1,0 +1,13 @@
+{
+  "name": "archguard-app",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "packages/*",
+    "indexer",
+    "apps/*"
+  ],
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
