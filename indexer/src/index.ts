@@ -1,3 +1,4 @@
+import http from "http";
 import cron from "node-cron";
 import * as StellarSdk from "@stellar/stellar-sdk";
 import { RegistryClient, ExtenderClient } from "@archguard/sdk";
@@ -14,6 +15,24 @@ console.log(`Registry Contract: ${config.registryContractId}`);
 console.log(`Extender Contract: ${config.extenderContractId}`);
 console.log(`Poll Interval: ${config.indexerPollIntervalSeconds}s`);
 console.log("==================================================");
+
+// HTTP Health Check Endpoint for Render / Web Service monitoring
+const port = process.env.PORT || 10000;
+const healthServer = http.createServer((_req, res) => {
+  res.writeHead(200, { "Content-Type": "application/json" });
+  res.end(
+    JSON.stringify({
+      status: "ok",
+      service: "archguard-indexer",
+      network: config.stellarNetwork,
+      timestamp: new Date().toISOString(),
+    })
+  );
+});
+
+healthServer.listen(port, () => {
+  console.log(`HTTP Health Check server listening on port ${port}`);
+});
 
 const server = new StellarSdk.rpc.Server(config.stellarRpcUrl);
 const registryClient = new RegistryClient(
