@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import * as StellarSdk from "@stellar/stellar-sdk";
-import { WatchedEntry, decodeKey } from "@archguard/sdk";
+import { decodeKey } from "@archguard/sdk";
+import type { WatchedEntry } from "@archguard/sdk";
 import { registryClient, registryContractId } from "@/lib/sdkClient";
 
 export function WatchedEntryList({

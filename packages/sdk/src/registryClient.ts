@@ -98,10 +98,10 @@ export class RegistryClient {
   /**
    * Registers a new organization with the registry.
    */
-  async registerOrg(org: StellarSdk.Keypair, webhookHash: Buffer): Promise<void> {
+  async registerOrg(org: StellarSdk.Keypair, webhookHash: Uint8Array): Promise<void> {
     const scValOrg = StellarSdk.Address.fromString(org.publicKey()).toScVal();
     const scValAdmin = StellarSdk.Address.fromString(org.publicKey()).toScVal();
-    const scValWebhook = StellarSdk.xdr.ScVal.scvBytes(webhookHash);
+    const scValWebhook = StellarSdk.xdr.ScVal.scvBytes(Buffer.from(webhookHash));
 
     await submitTransaction(
       this.rpcUrl,

@@ -4,7 +4,7 @@ export type Durability = "Instance" | "Persistent";
 
 export interface OrgConfig {
   admin: string;             // Stellar address
-  notifyWebhookHash: Buffer; // 32 bytes hash of the webhook URL
+  notifyWebhookHash: Uint8Array; // 32 bytes hash of the webhook URL
   active: boolean;
 }
 

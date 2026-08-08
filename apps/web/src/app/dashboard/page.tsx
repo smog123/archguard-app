@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import * as StellarSdk from "@stellar/stellar-sdk";
-import { WatchedEntry } from "@archguard/sdk";
+import type { WatchedEntry } from "@archguard/sdk";
 import { registryClient, registryContractId } from "@/lib/sdkClient";
 import { BalanceCard } from "@/components/BalanceCard";
 import { AddEntryForm } from "@/components/AddEntryForm";

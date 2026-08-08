@@ -3,7 +3,6 @@
 import { useState } from "react";
 import * as StellarSdk from "@stellar/stellar-sdk";
 import { registryClient, registryContractId } from "@/lib/sdkClient";
-import crypto from "crypto";
 
 export function OrgOnboarding({
   onRegistered,
@@ -35,8 +34,10 @@ export function OrgOnboarding({
       const orgKeypair = StellarSdk.Keypair.fromSecret(secretKey.trim());
       const rawUrl = webhookUrl.trim() || "https://example.com/webhook";
 
-      // Compute SHA-256 hash of the webhook URL
-      const webhookHash = crypto.createHash("sha256").update(rawUrl).digest();
+      // Compute SHA-256 hash of the webhook URL (Web Crypto API — browser-safe)
+      const webhookHash = new Uint8Array(
+        await crypto.subtle.digest("SHA-256", new TextEncoder().encode(rawUrl))
+      );
 
       setLoading(true);
 
