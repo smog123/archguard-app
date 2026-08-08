@@ -1,0 +1,22 @@
+{
+  "name": "@archguard/indexer",
+  "version": "1.0.0",
+  "private": true,
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "@archguard/sdk": "*",
+    "@stellar/stellar-sdk": "16.2.0",
+    "better-sqlite3": "^11.3.0",
+    "node-cron": "^3.0.3",
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "@types/better-sqlite3": "^7.6.11",
+    "@types/node-cron": "^3.0.11",
+    "typescript": "^5.0.0"
+  }
+}
