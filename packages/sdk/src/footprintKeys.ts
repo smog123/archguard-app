@@ -19,10 +19,7 @@ export function encodeKey(typedKey: TypedKey): StellarSdk.xdr.ScVal {
     case "u64": {
       const val = BigInt(typedKey.value);
       return StellarSdk.xdr.ScVal.scvU64(
-        new StellarSdk.xdr.Uint64({
-          low: Number(val & 0xffffffffn),
-          high: Number(val >> 32n),
-        })
+        new StellarSdk.xdr.Uint64(val)
       );
     }
     case "address":
@@ -36,18 +33,18 @@ export function encodeKey(typedKey: TypedKey): StellarSdk.xdr.ScVal {
  * Decodes an ScVal into a user-friendly TypedKey.
  */
 export function decodeKey(scVal: StellarSdk.xdr.ScVal): TypedKey {
-  const arm = scVal.arm();
+  const arm = scVal.switch().name;
   switch (arm) {
-    case "sym":
+    case "scvSymbol":
       return { type: "symbol", value: scVal.sym().toString() };
-    case "str":
+    case "scvString":
       return { type: "string", value: scVal.str().toString() };
-    case "u64": {
+    case "scvU64": {
       const u64Val = scVal.u64();
       const bigVal = (BigInt(u64Val.high) << 32n) | BigInt(u64Val.low);
       return { type: "u64", value: bigVal.toString() };
     }
-    case "address":
+    case "scvAddress":
       return {
         type: "address",
         value: StellarSdk.Address.fromScVal(scVal).toString(),

@@ -1,4 +1,3 @@
-import { Server } from "@stellar/stellar-sdk/rpc";
 import * as StellarSdk from "@stellar/stellar-sdk";
 
 /**
@@ -12,7 +11,7 @@ export async function extendInstanceAndCodeTtl(
   extendToLedgers: number,
   sourceKeypair: StellarSdk.Keypair
 ) {
-  const server = new Server(rpcUrl);
+  const server = new StellarSdk.rpc.Server(rpcUrl);
   const account = await server.getAccount(sourceKeypair.publicKey());
   const fee = "100"; // inclusion fee, resource fee is added by prepareTransaction
 
@@ -74,7 +73,7 @@ export async function extendPersistentDataTtl(
   extendToLedgers: number,
   sourceKeypair: StellarSdk.Keypair
 ) {
-  const server = new Server(rpcUrl);
+  const server = new StellarSdk.rpc.Server(rpcUrl);
   const account = await server.getAccount(sourceKeypair.publicKey());
   const fee = "100";
 

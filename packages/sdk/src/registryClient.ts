@@ -6,10 +6,7 @@ import { submitTransaction } from "./submitTransaction";
 
 export function bigintToScValU64(val: bigint): StellarSdk.xdr.ScVal {
   return StellarSdk.xdr.ScVal.scvU64(
-    new StellarSdk.xdr.Uint64({
-      low: Number(val & 0xffffffffn),
-      high: Number(val >> 32n),
-    })
+    new StellarSdk.xdr.Uint64(val)
   );
 }
 
@@ -55,7 +52,7 @@ export function parseWatchedEntry(scVal: StellarSdk.xdr.ScVal): WatchedEntry {
         break;
       }
       case "key": {
-        if (val.arm() === "void") {
+        if (val.switch().name === "scvVoid") {
           key = null;
         } else {
           const bytes = val.bytes();

@@ -1,4 +1,3 @@
-import { Server, rpc } from "@stellar/stellar-sdk";
 import * as StellarSdk from "@stellar/stellar-sdk";
 
 /**
@@ -11,7 +10,7 @@ export async function readContractValue(
   method: string,
   args: StellarSdk.xdr.ScVal[] = []
 ): Promise<StellarSdk.xdr.ScVal> {
-  const server = new Server(rpcUrl);
+  const server = new StellarSdk.rpc.Server(rpcUrl);
 
   // Use a dummy account for read-only simulation (no signature required)
   const dummyKeypair = StellarSdk.Keypair.random();
@@ -33,13 +32,14 @@ export async function readContractValue(
 
   const simResponse = await server.simulateTransaction(transaction);
 
-  if (rpc.isSimulationError(simResponse)) {
+  if (StellarSdk.rpc.Api.isSimulationError(simResponse)) {
     throw new Error(`Soroban simulation error invoking ${method}: ${simResponse.error}`);
   }
 
-  if (!simResponse.result || !simResponse.result.retval) {
+  const successResponse = simResponse as StellarSdk.rpc.Api.SimulateTransactionSuccessResponse;
+  if (!successResponse.result || !successResponse.result.retval) {
     throw new Error(`Soroban simulation of ${method} did not return a value`);
   }
 
-  return simResponse.result.retval;
+  return successResponse.result.retval;
 }

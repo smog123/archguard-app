@@ -1,4 +1,3 @@
-import { Server } from "@stellar/stellar-sdk";
 import * as StellarSdk from "@stellar/stellar-sdk";
 
 /**
@@ -13,7 +12,7 @@ export async function submitTransaction(
   args: StellarSdk.xdr.ScVal[],
   signer: StellarSdk.Keypair
 ): Promise<StellarSdk.xdr.ScVal | undefined> {
-  const server = new Server(rpcUrl);
+  const server = new StellarSdk.rpc.Server(rpcUrl);
 
   const account = await server.getAccount(signer.publicKey());
 
@@ -38,7 +37,7 @@ export async function submitTransaction(
   const sendResult = await server.sendTransaction(prepared);
   if (sendResult.status === "ERROR") {
     throw new Error(
-      `Transaction submission failed: ${sendResult.errorResultXdr || "unknown error"}`
+      `Transaction submission failed: ${sendResult.errorResult?.toXDR("base64") || "unknown error"}`
     );
   }
 
