@@ -159,6 +159,10 @@ export class RegistryClient {
     return parseU64(result);
   }
 
+  // ==========================================
+  // Remove and Update Entry Policy Methods
+  // ==========================================
+
   /**
    * Removes a watched entry.
    */
