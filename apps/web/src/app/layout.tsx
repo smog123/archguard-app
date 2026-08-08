@@ -60,9 +60,7 @@ export default function RootLayout({
             </span>
           </div>
           <div style={{ display: "flex", gap: "20px", fontSize: "0.9rem", color: "var(--text-muted)" }}>
-            <a href="/" style={{ hover: "color: white" }}>
-              Onboarding
-            </a>
+            <a href="/">Onboarding</a>
             <a href="/dashboard">Dashboard</a>
           </div>
         </nav>
