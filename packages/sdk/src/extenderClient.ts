@@ -43,6 +43,10 @@ export class ExtenderClient {
     );
   }
 
+  // ==========================================
+  // Operator and Balance Query Methods
+  // ==========================================
+
   /**
    * Records a keeper-charged extension cost against the org's prepaid balance (in stroops).
    */
