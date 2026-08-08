@@ -30,8 +30,8 @@ const healthServer = http.createServer((_req, res) => {
   );
 });
 
-healthServer.listen(port, () => {
-  console.log(`HTTP Health Check server listening on port ${port}`);
+healthServer.listen(Number(port), "0.0.0.0", () => {
+  console.log(`HTTP Health Check server listening on 0.0.0.0:${port}`);
 });
 
 const server = new StellarSdk.rpc.Server(config.stellarRpcUrl);
