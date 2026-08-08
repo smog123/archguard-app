@@ -206,6 +206,10 @@ export class RegistryClient {
     );
   }
 
+  // ==========================================
+  // Query and Org Deactivation Methods
+  // ==========================================
+
   /**
    * Reads all watched entries owned by an organization. Read-only.
    */
