@@ -1,75 +1,79 @@
-# Archguard App Monorepo (`archguard-app`)
+<!-- BANNER — manual follow-up: replace with a real banner image (e.g. repo
+     social preview) before Wave review. Do not ship the placeholder. -->
+![Archguard App](https://placehold.co/1200x300/090d16/06b6d4/png?text=Archguard+App)
 
-`archguard-app` is the off-chain component of **Archguard**, an automated smart contract TTL extension and custody funding system built for Stellar Soroban.
+# Archguard App
 
-## Structure
+Off-chain half of **Archguard** — the keeper and dashboard that keep your
+Stellar Soroban contracts alive.
 
-```
-archguard-app/
-├── package.json                 # root workspace config (npm workspaces)
-├── tsconfig.base.json
-├── .gitignore
-├── .env.example
-├── packages/
-│   └── sdk/                     # Client SDK wrapping Soroban contract RPC calls
-│       ├── src/
-│       │   ├── registryClient.ts
-│       │   ├── extenderClient.ts
-│       │   ├── ttlExtension.ts  # ExtendFootprintTTLOp builder
-│       │   ├── footprintKeys.ts # Ledger key encoders/decoders
-│       │   ├── types.ts
-│       │   └── readContractValue.ts
-├── indexer/                     # Keeper daemon polling TTLs and submitting extensions
-│   └── src/
-│       ├── index.ts             # Entrypoint with node-cron schedule
-│       ├── poller.ts            # TTL evaluation logic
-│       ├── extender.ts          # Extension transaction execution & cost recording
-│       ├── webhook.ts           # Alert webhook dispatcher
-│       └── db.ts                # SQLite org -> webhook URL store
-└── apps/
-    └── web/                     # Next.js 15 App Router web dashboard
-        └── src/
-            ├── app/
-            │   ├── page.tsx
-            │   └── dashboard/page.tsx
-            ├── components/
-            │   ├── OrgOnboarding.tsx
-            │   ├── AddEntryForm.tsx
-            │   ├── WatchedEntryList.tsx
-            │   └── BalanceCard.tsx
-            └── lib/
-                └── sdkClient.ts
-```
+## Table of Contents
 
-## Contract ID Placeholders (`PENDING_DEPLOYMENT`)
+- [What it does](#what-it-does)
+- [Maintainers](#maintainers)
+- [Quick start](#quick-start)
+- [Architecture](#architecture)
+- [Contributing](#contributing)
+- [Contributors](#contributors)
+- [About](#about)
 
-Contract deployment addresses for `ARCHGUARD_REGISTRY_CONTRACT_ID` and `ARCHGUARD_EXTENDER_CONTRACT_ID` default to `PENDING_DEPLOYMENT`.
-When Phase 8 deployment finishes, set the contract IDs in `.env` or your runtime environment.
+## What it does
 
-## Development & Testing
+Archguard watches deployed Soroban contracts and auto-extends their storage
+TTL before entries get archived. This monorepo contains the off-chain pieces:
+a TypeScript SDK wrapping the contract RPC calls, a keeper indexer that polls
+due entries and submits extensions, and a Next.js dashboard for orgs to prepay
+custody balances and manage watched entries.
 
-### Installation
+## Maintainers
+
+| Photo | Name | Role | GitHub | Telegram |
+| --- | --- | --- | --- | --- |
+| ![avatar](https://github.com/smog123.png?size=64) | **[Your Name]** | Maintainer | [@smog123](https://github.com/smog123) | **[Your Telegram]** |
+
+## Quick start
+
 ```bash
+# 1. Install dependencies
 npm install
-```
 
-### Run SDK & Indexer Tests
-```bash
-# Run SDK unit & integration tests
+# 2. Configure environment (contract IDs default to PENDING_DEPLOYMENT = simulated mode)
+cp .env.example .env
+#   then set KEEPER_OPERATOR_SECRET and your contract IDs
+
+# 3. Build + test the SDK
+npm run build -w packages/sdk
 npm test -w packages/sdk
 
-# Run Indexer unit tests
+# 4. Test + run the keeper indexer
 npm test -w indexer
-```
-
-### Run Next.js Web Dashboard
-```bash
-npm run dev -w apps/web
-```
-
-### Build Everything
-```bash
-npm run build -w packages/sdk
 npm run build -w indexer
-npm run build -w apps/web
+npm start -w indexer
+
+# 5. Run the web dashboard
+npm run dev -w apps/web    # http://localhost:3000
 ```
+
+## Architecture
+
+Three workspaces: `packages/sdk` wraps Soroban RPC (registry/extender
+clients, TTL extension builder, ledger-key encoders); `indexer` is the keeper
+daemon that polls TTLs on a cron schedule, submits
+`ExtendFootprintTTLOp` extensions, records costs on-chain, and fires alert
+webhooks; `apps/web` is a Next.js 15 dashboard for orgs to register, prepay
+XLM, and track watched entries. The on-chain contracts live in the
+[archguard-contract](https://github.com/smog123/archguard-contract) repo.
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md). Please report security issues
+privately — see [SECURITY.md](SECURITY.md).
+
+## Contributors
+
+[![Contributors](https://contrib.rocks/image?repo=smog123/archguard-app)](https://github.com/smog123/archguard-app/graphs/contributors)
+
+## About
+
+Live dashboard: [archguard-app on Vercel](https://archguard-app-e67xx0s07-smog3.vercel.app)
+(testnet).
