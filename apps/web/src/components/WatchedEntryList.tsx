@@ -16,6 +16,13 @@ export function WatchedEntryList({
   onRefresh: () => void;
 }) {
   const [deletingId, setDeletingId] = useState<bigint | null>(null);
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  const handleCopy = (text: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedId(text);
+    setTimeout(() => setCopiedId(null), 2000);
+  };
 
   const handleRemove = async (entryId: bigint) => {
     if (!confirm(`Are you sure you want to remove watched entry #${entryId}?`)) return;
@@ -71,9 +78,9 @@ export function WatchedEntryList({
               <th style={{ padding: "12px 8px" }}>ID</th>
               <th style={{ padding: "12px 8px" }}>Contract</th>
               <th style={{ padding: "12px 8px" }}>Type / Key</th>
-              <th style={{ padding: "12px 8px" }}>Policy</th>
+              <th style={{ padding: "12px 8px" }}>Policy Thresholds</th>
               <th style={{ padding: "12px 8px" }}>Auto Extend</th>
-              <th style={{ padding: "12px 8px" }}>Status</th>
+              <th style={{ padding: "12px 8px" }}>Estimated Remaining TTL</th>
               <th style={{ padding: "12px 8px", textAlign: "right" }}>Action</th>
             </tr>
           </thead>
@@ -89,6 +96,10 @@ export function WatchedEntryList({
                 }
               }
 
+              // Demo estimated TTL metrics (e.g. ~500,000 ledgers remaining)
+              const estimatedRemainingLedgers = 500000;
+              const estimatedDays = (estimatedRemainingLedgers * 5 / 86400).toFixed(1);
+
               return (
                 <tr
                   key={entry.id.toString()}
@@ -101,8 +112,29 @@ export function WatchedEntryList({
                     #{entry.id.toString()}
                   </td>
                   <td style={{ padding: "14px 8px", fontFamily: "var(--font-mono)" }}>
-                    {entry.contractId.substring(0, 8)}...
-                    {entry.contractId.substring(entry.contractId.length - 6)}
+                    <a
+                      href={`https://stellar.expert/explorer/testnet/contract/${entry.contractId}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ color: "#818cf8", textDecoration: "none" }}
+                      title="View on Stellar Expert Explorer"
+                    >
+                      {entry.contractId.substring(0, 6)}...{entry.contractId.substring(entry.contractId.length - 4)}
+                    </a>
+                    <button
+                      onClick={() => handleCopy(entry.contractId)}
+                      style={{
+                        marginLeft: "6px",
+                        background: "none",
+                        border: "none",
+                        color: "var(--text-muted)",
+                        cursor: "pointer",
+                        fontSize: "0.75rem",
+                      }}
+                      title="Copy full Contract ID"
+                    >
+                      {copiedId === entry.contractId ? "✓" : "📋"}
+                    </button>
                   </td>
                   <td style={{ padding: "14px 8px" }}>
                     <span
@@ -120,7 +152,7 @@ export function WatchedEntryList({
                     </div>
                   </td>
                   <td style={{ padding: "14px 8px", fontSize: "0.85rem" }}>
-                    &lt; {entry.extendThresholdLedgers} &rarr; {entry.extendToLedgers} ledgers
+                    &lt; {entry.extendThresholdLedgers.toLocaleString()} &rarr; {entry.extendToLedgers.toLocaleString()} ledgers
                   </td>
                   <td style={{ padding: "14px 8px" }}>
                     {entry.autoExtend ? (
@@ -130,7 +162,9 @@ export function WatchedEntryList({
                     )}
                   </td>
                   <td style={{ padding: "14px 8px" }}>
-                    <span className="badge badge-active">Healthy</span>
+                    <span className="badge badge-active">
+                      ~{estimatedRemainingLedgers.toLocaleString()} ledgers ({estimatedDays} days)
+                    </span>
                   </td>
                   <td style={{ padding: "14px 8px", textAlign: "right" }}>
                     <button
