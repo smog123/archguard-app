@@ -7,9 +7,11 @@ import { extenderClient, extenderContractId } from "@/lib/sdkClient";
 export function BalanceCard({
   orgAddress,
   orgSecretKey,
+  entryCount = 0,
 }: {
   orgAddress: string;
   orgSecretKey: string;
+  entryCount?: number;
 }) {
   const [balanceStroops, setBalanceStroops] = useState<bigint>(0n);
   const [amountXlm, setAmountXlm] = useState("");
@@ -82,7 +84,13 @@ export function BalanceCard({
     }
   };
 
-  const balanceXlm = (Number(balanceStroops) / 10000000).toFixed(4);
+  const balanceXlmNum = Number(balanceStroops) / 10000000;
+  const balanceXlmStr = balanceXlmNum.toFixed(4);
+  const isLowBalance = balanceXlmNum < 5.0;
+
+  // Runway estimation (assuming ~1,000 stroops fee per extension)
+  const estimatedExtensionsLeft = Math.floor(Number(balanceStroops) / 1000);
+  const estimatedMonths = entryCount > 0 ? (estimatedExtensionsLeft / (entryCount * 12)).toFixed(1) : "N/A";
 
   return (
     <div className="glass-card">
@@ -95,18 +103,40 @@ export function BalanceCard({
         }}
       >
         <h3 style={{ fontSize: "1.2rem", fontWeight: "700" }}>Prepaid Balance</h3>
-        <span className="badge badge-active">Custody Balance</span>
+        <span className={`badge ${isLowBalance ? "badge-warning" : "badge-active"}`}>
+          {isLowBalance ? "Low Balance Warning" : "Custody Balance"}
+        </span>
       </div>
 
       <div style={{ marginBottom: "20px" }}>
-        <div style={{ fontSize: "2.2rem", fontWeight: "800", letterSpacing: "-0.02em" }}>
-          {balanceXlm}{" "}
+        <div style={{ fontSize: "2.2rem", fontWeight: "800", letterSpacing: "-0.02em", color: isLowBalance ? "#f59e0b" : "#ffffff" }}>
+          {balanceXlmStr}{" "}
           <span style={{ fontSize: "1.2rem", color: "var(--text-muted)", fontWeight: "500" }}>
             XLM
           </span>
         </div>
         <div style={{ fontSize: "0.8rem", color: "var(--text-muted)", marginTop: "4px" }}>
-          {balanceStroops.toString()} Stroops available for keeper re-extensions
+          {balanceStroops.toString()} Stroops available for keeper extensions
+        </div>
+
+        {/* Runway & Low Balance Indicator */}
+        <div
+          style={{
+            marginTop: "12px",
+            padding: "10px 14px",
+            borderRadius: "8px",
+            background: isLowBalance ? "rgba(245, 158, 11, 0.1)" : "rgba(255, 255, 255, 0.03)",
+            border: `1px solid ${isLowBalance ? "rgba(245, 158, 11, 0.3)" : "rgba(255, 255, 255, 0.08)"}`,
+            fontSize: "0.82rem",
+          }}
+        >
+          <div style={{ color: isLowBalance ? "#fbbf24" : "var(--text-muted)", fontWeight: "500" }}>
+            Estimated Maintenance Runway:
+          </div>
+          <div style={{ marginTop: "2px", fontWeight: "600" }}>
+            ~{estimatedExtensionsLeft.toLocaleString()} extensions left
+            {entryCount > 0 && ` (~${estimatedMonths} months for ${entryCount} watched entries)`}
+          </div>
         </div>
       </div>
 

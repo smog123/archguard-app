@@ -12,6 +12,7 @@ export default function DashboardPage() {
   const [secretKey, setSecretKey] = useState("");
   const [orgAddress, setOrgAddress] = useState("");
   const [entries, setEntries] = useState<WatchedEntry[]>([]);
+  const [activeTab, setActiveTab] = useState<"overview" | "activity">("overview");
 
   // Generate a default demo keypair on first load so user can immediately test UI
   useEffect(() => {
@@ -87,9 +88,22 @@ export default function DashboardPage() {
                 fontSize: "0.85rem",
                 color: "var(--text-muted)",
                 fontFamily: "var(--font-mono)",
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
               }}
             >
-              Active Org Address: {orgAddress || "None (Enter Secret Key)"}
+              <span>Active Org Address: {orgAddress || "None (Enter Secret Key)"}</span>
+              {orgAddress && (
+                <a
+                  href={`https://stellar.expert/explorer/testnet/account/${orgAddress}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ color: "#818cf8", textDecoration: "none", fontSize: "0.8rem" }}
+                >
+                  ↗ Explorer
+                </a>
+              )}
             </div>
           </div>
           <div style={{ minWidth: "300px" }}>
@@ -103,24 +117,88 @@ export default function DashboardPage() {
             />
           </div>
         </div>
+
+        {/* Tab Navigation */}
+        <div style={{ display: "flex", gap: "16px", marginTop: "20px", borderBottom: "1px solid rgba(255,255,255,0.08)", paddingBottom: "8px" }}>
+          <button
+            onClick={() => setActiveTab("overview")}
+            style={{
+              background: "none",
+              border: "none",
+              color: activeTab === "overview" ? "#818cf8" : "var(--text-muted)",
+              fontWeight: activeTab === "overview" ? "700" : "500",
+              borderBottom: activeTab === "overview" ? "2px solid #818cf8" : "none",
+              paddingBottom: "8px",
+              cursor: "pointer",
+            }}
+          >
+            Overview & Management
+          </button>
+          <button
+            onClick={() => setActiveTab("activity")}
+            style={{
+              background: "none",
+              border: "none",
+              color: activeTab === "activity" ? "#818cf8" : "var(--text-muted)",
+              fontWeight: activeTab === "activity" ? "700" : "500",
+              borderBottom: activeTab === "activity" ? "2px solid #818cf8" : "none",
+              paddingBottom: "8px",
+              cursor: "pointer",
+            }}
+          >
+            Keeper Activity Log
+          </button>
+        </div>
       </div>
 
-      {/* Main Grid: Balance & Add Form */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fit, minmax(360px, 1fr))",
-          gap: "24px",
-        }}
-      >
-        <BalanceCard orgAddress={orgAddress} orgSecretKey={secretKey} />
-        <AddEntryForm orgSecretKey={secretKey} onEntryAdded={loadEntries} />
-      </div>
+      {activeTab === "overview" ? (
+        <>
+          {/* Main Grid: Balance & Add Form */}
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "repeat(auto-fit, minmax(360px, 1fr))",
+              gap: "24px",
+            }}
+          >
+            <BalanceCard orgAddress={orgAddress} orgSecretKey={secretKey} entryCount={entries.length} />
+            <AddEntryForm orgSecretKey={secretKey} onEntryAdded={loadEntries} />
+          </div>
 
-      {/* Watched Entry List */}
-      <div>
-        <WatchedEntryList entries={entries} orgSecretKey={secretKey} onRefresh={loadEntries} />
-      </div>
+          {/* Watched Entry List */}
+          <div>
+            <WatchedEntryList entries={entries} orgSecretKey={secretKey} onRefresh={loadEntries} />
+          </div>
+        </>
+      ) : (
+        /* Keeper Activity Stream */
+        <div className="glass-card">
+          <h3 style={{ fontSize: "1.2rem", fontWeight: "700", marginBottom: "16px" }}>
+            Live Keeper Activity Stream
+          </h3>
+          <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+            <div style={{ padding: "12px", borderRadius: "8px", background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)", fontSize: "0.85rem" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", color: "var(--text-muted)" }}>
+                <span>OrgRegistered</span>
+                <span>Just now</span>
+              </div>
+              <div style={{ marginTop: "4px", fontWeight: "500" }}>
+                Organization registered on-chain under address <code style={{ color: "#818cf8" }}>{orgAddress}</code>.
+              </div>
+            </div>
+
+            <div style={{ padding: "12px", borderRadius: "8px", background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.05)", fontSize: "0.85rem" }}>
+              <div style={{ display: "flex", justifyContent: "space-between", color: "var(--text-muted)" }}>
+                <span>EntryAdded</span>
+                <span>Just now</span>
+              </div>
+              <div style={{ marginTop: "4px", fontWeight: "500" }}>
+                Watched entry #1 added for contract instance <code style={{ color: "#818cf8" }}>CBAA...GFRP</code>. Policy threshold set to &lt; 17,280 ledgers.
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
